@@ -71,15 +71,8 @@ def _(event):
 
         if success:
             console.print("\n[green]--- Reply from server ---[/green]")
-#            print(result)
             console.print(html_to_rich(replace_brackets(result)))
-#            console.print(html_to_rich(result), markup=False)
-#            console.print(result, markup=False)
-#            console.flush()
-#            print(stdout)
             console.print(html_to_rich(replace_brackets(stdout)))
-#            console.print(html_to_rich(stdout), markup=False)
-#            console.print(stdout, markup=False)
             console.print("[green]--- End of reply ---[/green]")
             buffer.reset()  # Clear buffer after sending
         else:
