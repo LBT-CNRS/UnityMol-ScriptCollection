@@ -28,7 +28,9 @@ history = InMemoryHistory()
 kb = KeyBindings()
 
 #console = Console(force_terminal=True)
-console = Console(file=sys.__stdout__, force_terminal=True)
+#console = Console(file=sys.__stdout__, force_terminal=True)
+#console = Console(file=sys.__stdout__)
+console = Console(file=sys.__stdout__, markup=True)
 
 exit_requested = False
 
@@ -40,6 +42,13 @@ def html_to_rich(text):
     text = re.sub(r'</i>', '[/italic]', text)
     text = re.sub(r'<u>', '[underline]', text)
     text = re.sub(r'</u>', '[/underline]', text)
+    return text
+
+def replace_brackets(text):
+    # Replace [ with fullwidth ［ (U+FF3B)
+    # Replace ] with fullwidth ］ (U+FF3D)
+    text = text.replace('[', '［')
+    text = text.replace(']', '］')
     return text
 
 @kb.add('c-c', 'c-c')  # Ctrl-C Ctrl-C to send
@@ -62,8 +71,15 @@ def _(event):
 
         if success:
             console.print("\n[green]--- Reply from server ---[/green]")
-            console.print(html_to_rich(result))
-            console.print(html_to_rich(stdout))
+#            print(result)
+            console.print(html_to_rich(replace_brackets(result)))
+#            console.print(html_to_rich(result), markup=False)
+#            console.print(result, markup=False)
+#            console.flush()
+#            print(stdout)
+            console.print(html_to_rich(replace_brackets(stdout)))
+#            console.print(html_to_rich(stdout), markup=False)
+#            console.print(stdout, markup=False)
             console.print("[green]--- End of reply ---[/green]")
             buffer.reset()  # Clear buffer after sending
         else:
