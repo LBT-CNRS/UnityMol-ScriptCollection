@@ -20,6 +20,8 @@ history = InMemoryHistory()
 # Keybindings
 kb = KeyBindings()
 
+exit_requested = False
+
 @kb.add('c-c', 'c-c')  # Ctrl-C Ctrl-C to send
 def _(event):
     buffer = event.app.current_buffer
@@ -46,9 +48,11 @@ def _(event):
     else:
         print("\n[Empty input, nothing sent]")
 
-@kb.add('c-c', 'c-q')  # Ctrl-C Ctrl-Q to quit
+@kb.add('c-c', 'c-q')
 def _(event):
-    print("\n[Quit]")
+    global exit_requested
+    print("\n[Quit requested]")
+    exit_requested = True
     event.app.exit()
 
 # Create prompt session
@@ -63,7 +67,7 @@ print("Multiline ZMQ editor. Use C-c C-c to send, C-c C-q to quit.")
 print("C-a / C-e / M-d etc. for Emacs-style editing. Arrows or M-p / M-n for history.")
 
 # REPL loop
-while True:
+while not exit_requested:
     with patch_stdout():
         try:
             session.prompt()
