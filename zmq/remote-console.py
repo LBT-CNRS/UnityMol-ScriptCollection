@@ -78,7 +78,7 @@ def _(event):
         else:
             console.print("\n[red]--- Server replied with error !! ---[/red]\n")    
     else:
-        console.print("\n[Empty input, nothing sent]")
+        console.print("\n[yellow][Empty input, nothing sent][/yellow]")
 
 @kb.add('c-c', 'c-q')
 def _(event):
