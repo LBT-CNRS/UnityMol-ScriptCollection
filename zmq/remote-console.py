@@ -6,6 +6,13 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.application import get_app
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.patch_stdout import patch_stdout
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+
+# from rich import print
+# from rich.markdown import Markdown
+from rich.console import Console
+import re
+import sys
 
 import zmq
 import json
@@ -20,7 +27,20 @@ history = InMemoryHistory()
 # Keybindings
 kb = KeyBindings()
 
+#console = Console(force_terminal=True)
+console = Console(file=sys.__stdout__, force_terminal=True)
+
 exit_requested = False
+
+def html_to_rich(text):
+    # Simple replacements: <b> → [bold], </b> → [/bold], etc.
+    text = re.sub(r'<b>', '[bold]', text)
+    text = re.sub(r'</b>', '[/bold]', text)
+    text = re.sub(r'<i>', '[italic]', text)
+    text = re.sub(r'</i>', '[/italic]', text)
+    text = re.sub(r'<u>', '[underline]', text)
+    text = re.sub(r'</u>', '[/underline]', text)
+    return text
 
 @kb.add('c-c', 'c-c')  # Ctrl-C Ctrl-C to send
 def _(event):
@@ -39,28 +59,36 @@ def _(event):
         success = data.get("success", "false")  # Defaults to "false" if key is not found
         result = data.get("result", "No result")
         stdout = data.get("stdout", "No output")
-        
-        if (success):
-            print("\n--- Reply from server ---\n" + result + "\n" + stdout + "\n--- End of reply ---\n")
+
+        if success:
+            console.print("\n[green]--- Reply from server ---[/green]")
+            console.print(html_to_rich(result))
+            console.print(html_to_rich(stdout))
+            console.print("[green]--- End of reply ---[/green]")
             buffer.reset()  # Clear buffer after sending
         else:
-            print("\n--- Server replied with error !! ---\n")
+            console.print("\n[red]--- Server replied with error !! ---[/red]\n")    
     else:
-        print("\n[Empty input, nothing sent]")
+        console.print("\n[Empty input, nothing sent]")
 
 @kb.add('c-c', 'c-q')
 def _(event):
     global exit_requested
-    print("\n[Quit requested]")
+    console.print("\n[red][Quit requested]")
     exit_requested = True
     event.app.exit()
 
+@kb.add('c-l')
+def _(event):
+    console.clear()
+    
 # Create prompt session
 session = PromptSession(
     "> ",
     multiline=True,
     key_bindings=kb,
-    history=history
+    history=history,
+    auto_suggest=AutoSuggestFromHistory(),
 )
 
 print("Multiline ZMQ editor. Use C-c C-c to send, C-c C-q to quit.")
@@ -72,5 +100,5 @@ while not exit_requested:
         try:
             session.prompt()
         except (EOFError, KeyboardInterrupt):
-            print("\n[Interrupted]")
+            console.print("[red]\n[Interrupted]")
             break
