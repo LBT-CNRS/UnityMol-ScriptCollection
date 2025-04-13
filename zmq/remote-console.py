@@ -6,7 +6,6 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.application import get_app
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.patch_stdout import patch_stdout
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 # from rich import print
 # from rich.markdown import Markdown
@@ -16,6 +15,9 @@ import sys
 
 import zmq
 import json
+
+# AutoSuggest implementation
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 # ZMQ setup
 socket = zmq.Context.instance().socket(zmq.REQ)
@@ -33,6 +35,13 @@ console = Console(file=sys.__stdout__, markup=True)
 exit_requested = False
 
 def html_to_rich(text):
+    """Convert HTML-like tags to Rich markup, assuming square brackets were handled"""
+    if not text:
+        return ""
+    
+    # Convert to string and escape square brackets first
+    text = str(text)
+
     # Simple replacements: <b> → [bold], </b> → [/bold], etc.
     text = re.sub(r'<b>', '[bold]', text)
     text = re.sub(r'</b>', '[/bold]', text)
@@ -40,6 +49,7 @@ def html_to_rich(text):
     text = re.sub(r'</i>', '[/italic]', text)
     text = re.sub(r'<u>', '[underline]', text)
     text = re.sub(r'</u>', '[/underline]', text)
+    
     return text
 
 def replace_brackets(text):
