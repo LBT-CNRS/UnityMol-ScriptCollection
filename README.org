@@ -5,8 +5,8 @@ A collection of useful and instructive scripts
 
 ** Subdirectory =zmq=
 
-| Filename                 | Description                                    |
-|--------------------------+------------------------------------------------|
-| =remote-console.py=      | Implementing a python console outside UnityMol |
-| =updated-zmq-console.py= | Utility library for ZMQ connectivity           |
+| Filename            | Description                                    |
+|---------------------+------------------------------------------------|
+| =remote-console.py= | Implementing a python console outside UnityMol |
+| =unitymol_zmq.py=   | Utility library for ZMQ connectivity           |
 
