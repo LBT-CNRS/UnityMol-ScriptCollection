@@ -27,9 +27,7 @@ history = InMemoryHistory()
 # Keybindings
 kb = KeyBindings()
 
-#console = Console(force_terminal=True)
-#console = Console(file=sys.__stdout__, force_terminal=True)
-#console = Console(file=sys.__stdout__)
+# Rich console setup
 console = Console(file=sys.__stdout__, markup=True)
 
 exit_requested = False
@@ -102,6 +100,7 @@ session = PromptSession(
 
 print("Multiline ZMQ editor. Use C-c C-c to send, C-c C-q to quit.")
 print("C-a / C-e / M-d etc. for Emacs-style editing. Arrows or M-p / M-n for history.")
+print("Tab to cycle through suggestions.")
 
 # REPL loop
 while not exit_requested:
