@@ -28,7 +28,7 @@ import os
 # Custom AutoSuggest implementation (paste the class from the previous code)
 from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
 
-from unity_inspired_auto_suggester import UnityMolAutoSuggest, get_suggestion
+from unity_inspired_auto_suggester import UnityMolAutoSuggest
 
 # UnityMol ZMQ setup
 # Update the ZMQ connection settings
@@ -119,7 +119,7 @@ session = PromptSession(
     multiline=True,
     key_bindings=kb,
     history=history,
-    auto_suggest=UnityMolAutoSuggest(socket),
+    auto_suggest=UnityMolAutoSuggest(unitymol_zmq.unitymol.socket),
 )
 
 print("Multiline ZMQ editor. Prints out command result, stdout and one blank line.")

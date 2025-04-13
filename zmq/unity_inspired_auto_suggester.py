@@ -367,8 +367,6 @@ class UnityMolAutoSuggest(AutoSuggest):
 
 
 # You can use it like this:
-# socket = zmq.Context.instance().socket(zmq.REQ)
-# socket.connect("tcp://localhost:5555")
 # session = PromptSession(
 #     "> ",
 #     multiline=True,
