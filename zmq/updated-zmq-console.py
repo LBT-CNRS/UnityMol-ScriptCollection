@@ -1,12 +1,5 @@
-# remote-console.py
-# UnityMol Development Script
-# (c) 2025 by Marc BAADEN
-# MIT license
-
 # A demo python script to implement an external console for UnityMol
 # using the ZMQ server connection
-
-__version__ = "0.1.0"
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.key_binding import KeyBindings
@@ -22,19 +15,17 @@ import sys
 
 import zmq
 import json
+import os
 
-# AutoSuggest implementation
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
-# UnityMol ZMQ setup
-# Update the ZMQ connection settings
-import unitymol_zmq
+# Custom AutoSuggest implementation (paste the class from the previous code)
+from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
 
-# Initialize UnityMolZMQ and connect once
-if unitymol_zmq.unitymol is None:
-    print("\nDebug: Attempting to establish connection to UnityMol ZMQ server")
-    unitymol_zmq.unitymol = unitymol_zmq.UnityMolZMQ()
-    unitymol_zmq.unitymol.connect()
+from unity_inspired_auto_suggester import UnityMolAutoSuggest, get_suggestion
+
+# ZMQ setup
+socket = zmq.Context.instance().socket(zmq.REQ)
+socket.connect("tcp://localhost:5555")
 
 # History
 history = InMemoryHistory()
@@ -51,10 +42,10 @@ def html_to_rich(text):
     """Convert HTML-like tags to Rich markup, assuming square brackets were handled"""
     if not text:
         return ""
-    
+        
     # Convert to string and escape square brackets first
     text = str(text)
-
+    
     # Simple replacements: <b> → [bold], </b> → [/bold], etc.
     text = re.sub(r'<b>', '[bold]', text)
     text = re.sub(r'</b>', '[/bold]', text)
@@ -81,7 +72,10 @@ def _(event):
         history.append_string(text)
 
         # Send over ZMQ
-        data = unitymol_zmq.unitymol.send_command(text)
+        socket.send_string(text)
+        reply = socket.recv().decode()
+        # Deserialize the JSON string to a Python dictionary
+        data = json.loads(reply)
         # Now you can access the dictionary keys
         success = data.get("success", "false")  # Defaults to "false" if key is not found
         result = data.get("result", "No result")
@@ -109,19 +103,18 @@ def _(event):
 def _(event):
     console.clear()
     
-# Create prompt session
+# Create prompt session with our custom auto-suggester
 session = PromptSession(
     "> ",
     multiline=True,
     key_bindings=kb,
     history=history,
-    auto_suggest=AutoSuggestFromHistory(),
+    auto_suggest=UnityMolAutoSuggest(socket),
 )
 
-print("Multiline ZMQ editor. Prints out command result, stdout and one blank line.")
-print("Use C-c C-c to send, C-c C-q to quit.")
+print("Multiline ZMQ editor. Use C-c C-c to send, C-c C-q to quit.")
 print("C-a / C-e / M-d etc. for Emacs-style editing. Arrows or M-p / M-n for history.")
-#print("Tab to cycle through suggestions.")
+print("Tab to cycle through suggestions.")
 
 # REPL loop
 while not exit_requested:
