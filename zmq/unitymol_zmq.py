@@ -15,6 +15,7 @@ __version__ = "0.1.0"
 import zmq
 import json
 import logging
+import re
 
 unitymol = None
 
@@ -97,7 +98,52 @@ class UnityMolZMQ:
             self.socket.close()
             self.connected = False
             logger.info("Disconnected from UnityMol ZMQ server")
-    
+
+    def send_command_clean(self, command):
+        """
+        Sends a command and returns the cleaned text response.
+        """
+        raw_response = self.send_command(command)
+
+        # Verify that the response is a dictionary
+        if not isinstance(raw_response, dict):
+            logger.error(f"Expected dict, got {type(raw_response)}: {raw_response}")
+            return str(raw_response)
+
+        try:
+            # Extract relevant fields with defaults
+            success = raw_response.get('success', False)
+            result = raw_response.get('result', '')
+            stdout = raw_response.get('stdout', '')
+
+            # Construct the response string
+            response_text = f"Success: {success} | Result: {result} | Output: {stdout}"
+
+            # Clean the response text
+            cleaned_text = self._clean_text(response_text)
+            logger.debug(f"Cleaned Response: {cleaned_text}")
+
+            return cleaned_text
+
+        except Exception as e:
+            logger.exception(f"Error processing response: {e}")
+            return str(raw_response)
+
+    def _clean_text(self, text):
+        """
+Cleans the text by removing HTML-like tags and specific substrings.
+"""
+        # Remove HTML-like tags
+        text = re.sub(r'<[^>]+>', '', text)
+        # Remove specific substrings like [Log]
+        text = text.replace('[Log]', '')
+        # Remove specific substrings like [Log]
+        text = text.replace('>>>', '')
+        # Normalize whitespace
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+
+
     def send_command(self, command):
         """
         Send a command to UnityMol and receive the response.
