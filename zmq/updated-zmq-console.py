@@ -1,5 +1,12 @@
+# remote-console.py
+# UnityMol Development Script
+# (c) 2025 by Marc BAADEN
+# MIT license
+
 # A demo python script to implement an external console for UnityMol
 # using the ZMQ server connection
+
+__version__ = "0.1.0"
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.key_binding import KeyBindings
@@ -23,9 +30,15 @@ from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
 
 from unity_inspired_auto_suggester import UnityMolAutoSuggest, get_suggestion
 
-# ZMQ setup
-socket = zmq.Context.instance().socket(zmq.REQ)
-socket.connect("tcp://localhost:5555")
+# UnityMol ZMQ setup
+# Update the ZMQ connection settings
+import unitymol_zmq
+
+# Initialize UnityMolZMQ and connect once
+if unitymol_zmq.unitymol is None:
+    print("\nDebug: Attempting to establish connection to UnityMol ZMQ server")
+    unitymol_zmq.unitymol = unitymol_zmq.UnityMolZMQ()
+    unitymol_zmq.unitymol.connect()
 
 # History
 history = InMemoryHistory()
@@ -72,10 +85,7 @@ def _(event):
         history.append_string(text)
 
         # Send over ZMQ
-        socket.send_string(text)
-        reply = socket.recv().decode()
-        # Deserialize the JSON string to a Python dictionary
-        data = json.loads(reply)
+        data = unitymol_zmq.unitymol.send_command(text)
         # Now you can access the dictionary keys
         success = data.get("success", "false")  # Defaults to "false" if key is not found
         result = data.get("result", "No result")
@@ -112,7 +122,8 @@ session = PromptSession(
     auto_suggest=UnityMolAutoSuggest(socket),
 )
 
-print("Multiline ZMQ editor. Use C-c C-c to send, C-c C-q to quit.")
+print("Multiline ZMQ editor. Prints out command result, stdout and one blank line.")
+print("Use C-c C-c to send, C-c C-q to quit.")
 print("C-a / C-e / M-d etc. for Emacs-style editing. Arrows or M-p / M-n for history.")
 print("Tab to cycle through suggestions.")
 
