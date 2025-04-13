@@ -22,9 +22,13 @@ import sys
 
 import zmq
 import json
+import os
 
-# AutoSuggest implementation
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+
+# Custom AutoSuggest implementation (paste the class from the previous code)
+from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
+
+from unity_inspired_auto_suggester import UnityMolAutoSuggest, get_suggestion
 
 # UnityMol ZMQ setup
 # Update the ZMQ connection settings
@@ -51,10 +55,10 @@ def html_to_rich(text):
     """Convert HTML-like tags to Rich markup, assuming square brackets were handled"""
     if not text:
         return ""
-    
+        
     # Convert to string and escape square brackets first
     text = str(text)
-
+    
     # Simple replacements: <b> → [bold], </b> → [/bold], etc.
     text = re.sub(r'<b>', '[bold]', text)
     text = re.sub(r'</b>', '[/bold]', text)
@@ -109,19 +113,19 @@ def _(event):
 def _(event):
     console.clear()
     
-# Create prompt session
+# Create prompt session with our custom auto-suggester
 session = PromptSession(
     "> ",
     multiline=True,
     key_bindings=kb,
     history=history,
-    auto_suggest=AutoSuggestFromHistory(),
+    auto_suggest=UnityMolAutoSuggest(socket),
 )
 
 print("Multiline ZMQ editor. Prints out command result, stdout and one blank line.")
 print("Use C-c C-c to send, C-c C-q to quit.")
 print("C-a / C-e / M-d etc. for Emacs-style editing. Arrows or M-p / M-n for history.")
-#print("Tab to cycle through suggestions.")
+print("Tab to cycle through suggestions.")
 
 # REPL loop
 while not exit_requested:
