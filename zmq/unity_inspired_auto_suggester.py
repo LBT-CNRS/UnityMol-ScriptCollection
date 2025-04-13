@@ -1,4 +1,4 @@
-from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion, abstractmethod
+from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
 from prompt_toolkit.document import Document
 import os
 import re
@@ -279,7 +279,6 @@ class UnityMolAutoSuggest(AutoSuggest):
             
         return result
 
-    @abstractmethod
     def get_suggestion(self, buffer, document):
         """Main method to get suggestions for prompt_toolkit"""
         text = document.text
