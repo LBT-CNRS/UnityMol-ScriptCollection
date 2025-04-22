@@ -4,7 +4,7 @@ import System
 # --- Global state ---
 sound_loop_active = False
 rnd = System.Random()
-uiref = "CanvasMainUI/Selection Scroll View/Viewport/Content/"
+uiref = "CanvasMainUIVR/Selection Scroll View/Viewport/Content/"
 
 # --- Utility functions ---
 def random_atom_pos(sel):
@@ -20,13 +20,13 @@ def myform(label, pos):
 def button_ref(path):
     return GameObject.Find(uiref + path).GetComponent("Button")
 
-# --- Coroutine to play sound every 2 seconds ---
+# --- Coroutine to play sound at short intervals ---
 def sound_loop():
     global sound_loop_active
     sound_loop_active = True
     while sound_loop_active:
         playSoundAtPosition(sound_position)
-        yield APIPython.pythonConsole.waitSeconds(1.9)
+        yield APIPython.pythonConsole.waitSeconds(1.1)
 
 # --- Function to set up callbacks ---
 def go():
