@@ -3,6 +3,12 @@ A collection of useful and instructive scripts
 
 * Overview
 
+** Subdirectory =vr=
+
+| Filename          | Description                                 |
+|-------------------+---------------------------------------------|
+| =sonar-demo.py=   | Implementing a randomly located sonar sound |
+
 ** Subdirectory =zmq=
 
 | Filename            | Description                                    |
