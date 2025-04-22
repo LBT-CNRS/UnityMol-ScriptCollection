@@ -1,12 +1,10 @@
-import UnityEngine
-from UnityEngine import Vector3
-import time
+from UnityEngine import Vector3, GameObject
 import System
-
 
 # --- Global state ---
 sound_position = Vector3(0.0, 0.0, 0.0)
 sound_loop_active = False
+rnd = System.Random()
 uiref = "CanvasMainUI/Selection Scroll View/Viewport/Content/"
 
 def button_ref(button):
@@ -14,14 +12,10 @@ def button_ref(button):
     return GameObject.Find(uiref+button).GetComponent("Button")
 
 def random_res_pos(s):
-    max=s.currentModel.GetChains()[0].residues.Count
-    rnd = System.Random()
-    rand_int = rnd.Next(1, max + 1)  # max + 1 car .Next(a, b) retourne [a, b)
-    sel=select("resid "+str(rand_int)+" and name CA")
-    if sel.atoms:
-        return sel.atoms[0].position
-    else:
-        return None  # ou gérer autrement
+    nres = s.currentModel.GetChains()[0].residues.Count
+    resid = rnd.Next(1, nres + 1)
+    sel=select("resid {} and name CA".format(resid))
+    return sel.atoms[0].position if sel.atoms else None
 
 # --- Coroutine to play sound every 2 seconds ---
 def sound_loop():
