@@ -3,8 +3,9 @@ from UnityEngine import Vector3
 import time
 import System
 
+
 # --- Global state ---
-sound_position = Vector3(0.0, 10.0, 0.0)
+sound_position = Vector3(0.0, 0.0, 0.0)
 sound_loop_active = False
 uiref = "CanvasMainUI/Selection Scroll View/Viewport/Content/"
 
@@ -56,7 +57,7 @@ def go():
     def random_sound_position():
         global sound_position
         sound_position = random_res_pos(last())
-        print("NOTE:: Sound position set to:", sound_position)
+        print("NOTE:: Sound position set to:", sound_position[0], sound_position[1], sound_position[2])
     
     # Get the reference to the "Start Tour" button
     b=button_ref("TourButtons/TourStart/Button Layer")
@@ -76,6 +77,12 @@ def go():
         b.onClick.AddListener(random_sound_position)
     else:
         print("TourNext Button component not found! Maybe the Tour menu was not opened?")
+
+# Load a PDB to play with
+fetch("1crn")
+
+# Initialize a random position for the first sound
+sound_position = random_res_pos(last())
 
 # All has been set up, let's go!
 go()
