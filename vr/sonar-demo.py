@@ -1,16 +1,27 @@
 import UnityEngine
 from UnityEngine import Vector3
 import time
+import System
 
 # --- Global state ---
-sound_position = Vector3(0.0, 0.0, 0.0)
+sound_position = Vector3(0.0, 10.0, 0.0)
 sound_loop_active = False
 uiref = "CanvasMainUI/Selection Scroll View/Viewport/Content/"
 
 def button_ref(button):
     global uiref
     return GameObject.Find(uiref+button).GetComponent("Button")
-    
+
+def random_res_pos(s):
+    max=s.currentModel.GetChains()[0].residues.Count
+    rnd = System.Random()
+    rand_int = rnd.Next(1, max + 1)  # max + 1 car .Next(a, b) retourne [a, b)
+    sel=select("resid "+str(rand_int)+" and name CA")
+    if sel.atoms:
+        return sel.atoms[0].position
+    else:
+        return None  # ou gérer autrement
+
 # --- Coroutine to play sound every 2 seconds ---
 def sound_loop():
     global sound_loop_active
@@ -41,6 +52,12 @@ def go():
         sound_loop_active = False
         print("NOTE:: Sound loop stopped.")
 
+    # --- Set sound position randomly ---
+    def random_sound_position():
+        global sound_position
+        sound_position = random_res_pos(last())
+        print("NOTE:: Sound position set to:", sound_position)
+    
     # Get the reference to the "Start Tour" button
     b=button_ref("TourButtons/TourStart/Button Layer")
     if b:
@@ -56,7 +73,7 @@ def go():
 
     b=button_ref("TourButtons/TourNext/Button Layer")
     if b:
-        b.onClick.AddListener(stop_sound)
+        b.onClick.AddListener(random_sound_position)
     else:
         print("TourNext Button component not found! Maybe the Tour menu was not opened?")
 
