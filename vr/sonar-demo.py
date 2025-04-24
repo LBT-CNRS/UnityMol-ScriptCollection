@@ -5,6 +5,8 @@ import System
 sound_loop_active = False
 rnd = System.Random()
 uiref = "CanvasMainUIVR/Selection Scroll View/Viewport/Content/"
+# To test outside VR, comment the above and uncomment below
+#uiref = "CanvasMainUI/Selection Scroll View/Viewport/Content/"
 
 # --- Utility functions ---
 def random_atom_pos(sel):
@@ -67,6 +69,9 @@ def go():
 # Check if the Tour menu is already open, if not open it
 if GameObject.Find(uiref + "TourLabel/PanelLayer/Expand").activeSelf:
     button_ref("TourLabel/PanelLayer").onClick.Invoke()
+
+UnityMolMain.allowIDLE = False
+Application.runInBackground = True
 
 # Load a PDB and init
 fetch("3eam")
